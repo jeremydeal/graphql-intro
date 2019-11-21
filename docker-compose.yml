@@ -1,0 +1,46 @@
+version: '3.4'
+
+services:
+  babysfirstgraphqlsite:
+    image: ${DOCKER_REGISTRY-}babysfirstgraphqlsite
+    build:
+      context: ./babys-first-graphql-app
+      dockerfile: Dockerfile
+    ports:
+      - '11112:80'
+    depends_on:
+      - babysfirstgraphqlservice
+
+  babysfirstgraphqlservice:
+    image: ${DOCKER_REGISTRY-}babysfirstgraphqlservice
+    build:
+      context: .
+      dockerfile: BabysFirstGraphQLService/Dockerfile
+    depends_on:
+      - mongo
+      - postgres
+
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+    volumes:
+      - '/mongoData:/data/db'
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - '5432:5432'
+    volumes:
+      - '/postgresData:/var/lib/postgresql/data'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - '10239:8080'
